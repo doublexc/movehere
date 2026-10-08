@@ -1,0 +1,67 @@
+{
+  "profile_name": "Pull File Add-on",
+  "version": "1.1.0",
+  "settings": {
+    "default_search_mode": "intent",
+    "terminal_shell": "cmd.exe",
+    "keep_terminal_open_after_run": true
+  },
+  "categories": [
+    {
+      "id": "custom",
+      "name": "Custom Workflows",
+      "commands": [
+        {
+          "id": "pull_file",
+          "name": "ดึงไฟล์มาไว้โฟลเดอร์นี้ (ใส่ชื่อไฟล์เอง)",
+          "execution_mode": "batch",
+          "commands": [
+            "set \"LIB=D:\\MyProject\\release\\lib.txt\"",
+            "if not exist \"D:\\MyProject\\release\" mkdir \"D:\\MyProject\\release\"",
+            "set FILE={file}",
+            "set FROM={from}",
+            "set \"OLD=\"",
+            "if exist \"%LIB%\" for /f \"usebackq tokens=1,* delims==\" %%A in (\"%LIB%\") do if /i \"%%A\"==\"%FILE%\" set \"OLD=%%B\"",
+            "if not defined OLD set \"OLD=%FROM%\"",
+            "if not defined OLD (echo ยังไม่รู้ที่อยู่ของ \"%FILE%\" ครั้งแรกให้ใส่ช่องโฟลเดอร์เดิมด้วย & exit /b 1)",
+            "if /i \"%OLD%\"==\"%CD%\" (echo ไฟล์อยู่ในโฟลเดอร์นี้แล้ว & exit /b 0)",
+            "if not exist \"%OLD%\\%FILE%\" (echo ไม่พบ \"%FILE%\" ที่ \"%OLD%\" & exit /b 1)",
+            "if exist \"%CD%\\%FILE%\" (echo ในโฟลเดอร์นี้มี \"%FILE%\" อยู่แล้ว ไม่ย้ายทับ & exit /b 1)",
+            "move /y \"%OLD%\\%FILE%\" \"%CD%\\\" >nul",
+            "if errorlevel 1 (echo ย้ายไม่สำเร็จ ไฟล์อาจกำลังถูกใช้งานอยู่ & exit /b 1)",
+            "if exist \"%LIB%\" (findstr /v /b /i /l /c:\"%FILE%=\" \"%LIB%\">\"%LIB%.tmp\") else (type nul>\"%LIB%.tmp\")",
+            "for %%X in (\"%CD%\") do echo %FILE%=%%~X>>\"%LIB%.tmp\"",
+            "move /y \"%LIB%.tmp\" \"%LIB%\" >nul",
+            "echo ย้ายเสร็จแล้ว: \"%CD%\\%FILE%\""
+          ],
+          "description": "หาที่อยู่ล่าสุดของไฟล์จาก lib.txt แล้วย้ายมาไว้โฟลเดอร์นี้ จากนั้นจดที่อยู่ใหม่",
+          "tags": [
+            "ย้ายไฟล์",
+            "ดึงไฟล์",
+            "movetool",
+            "เอาไฟล์มา",
+            "lib"
+          ],
+          "pin_category": false,
+          "pin_global": false,
+          "need_input": true,
+          "input_mode": "placeholder",
+          "inputs": [
+            {
+              "name": "file",
+              "label": "ชื่อไฟล์ที่ต้องการดึง",
+              "placeholder": "เช่น aaaa.exe",
+              "required": true
+            },
+            {
+              "name": "from",
+              "label": "โฟลเดอร์เดิมของไฟล์ (ใส่เฉพาะครั้งแรก)",
+              "placeholder": "เช่น D:\\Tools (ไม่ต้องมี \\ ท้าย ห้ามมี วงเล็บ)",
+              "required": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
